@@ -11,8 +11,8 @@ export async function getVectorStore() {
     model: process.env.HF_EMBED_MODEL || "sentence-transformers/all-MiniLM-L6-v2",
   });
 
-  // Use fromExistingCollection if you are sure it exists
-  const store = await Chroma.fromExistingCollection(embeddings, {
+  // Always return a Chroma instance with embeddings
+  const store = new Chroma(embeddings, {
     url: CHROMA_URL,
     collectionName: COLLECTION_NAME,
   });
@@ -26,18 +26,21 @@ export async function getOrCreateVectorStore() {
     model: process.env.HF_EMBED_MODEL || "sentence-transformers/all-MiniLM-L6-v2",
   });
 
-  // First, attempt to create or connect
-  const store = await Chroma.fromExistingCollection(embeddings, {
-    url: CHROMA_URL,
-    collectionName: COLLECTION_NAME,
-  }).catch(async () => {
-    // If collection doesn’t exist, create it
-    return new Chroma(embeddings, {
+  // Try to connect; if fails, create a new collection
+  let store;
+  try {
+    store = await Chroma.fromExistingCollection(embeddings, {
       url: CHROMA_URL,
       collectionName: COLLECTION_NAME,
     });
-  });
+  } catch {
+    store = new Chroma(embeddings, {
+      url: CHROMA_URL,
+      collectionName: COLLECTION_NAME,
+    });
+  }
 
   return store;
 }
+
 

@@ -78,3 +78,6 @@ The server will start on `http://localhost:4000`
 - `CHROMA_COLLECTION` - Collection name (default: news_articles)
 - `REDIS_URL` - Redis connection URL (default: redis://localhost:6379)
 - `PORT` - Server port (default: 4000)
+
+
+
